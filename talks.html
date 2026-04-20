@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mini Talks — Gradion AI Learning Platform</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a class="navbar-brand" href="index.html">
+      <div class="navbar-logo">G</div>
+      <div class="navbar-brand-text">
+        <span class="navbar-brand-name">Gradion</span>
+        <span class="navbar-brand-subtitle">AI Learning Platform</span>
+      </div>
+    </a>
+    <ul class="navbar-nav" id="navbar-nav">
+      <li><a href="index.html">🏠 Home</a></li>
+      <li><a href="blog.html">📰 IT Blog</a></li>
+      <li><a href="talks.html" class="active">🎥 Mini Talks</a></li>
+      <li><a href="quiz.html">🎮 AI Quiz</a></li>
+    </ul>
+    <div class="navbar-right" id="navbar-right">
+      <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+    </div>
+    <button class="navbar-toggle" onclick="toggleNav()" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="container">
+    <h1>🎥 Mini Talks</h1>
+    <p>Internal presentations, video talks, and downloadable slides</p>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="section">
+  <div class="container">
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <div class="search-bar" style="min-width:260px">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" class="form-control" placeholder="Search talks…" oninput="filterTalks()">
+        </div>
+        <div class="filter-bar" id="filter-bar">
+          <button class="filter-tag active" data-topic="all" onclick="setFilter('all',this)">All</button>
+          <button class="filter-tag" data-topic="Generative AI" onclick="setFilter('Generative AI',this)">Generative AI</button>
+          <button class="filter-tag" data-topic="Advanced AI" onclick="setFilter('Advanced AI',this)">Advanced AI</button>
+          <button class="filter-tag" data-topic="AI Tools" onclick="setFilter('AI Tools',this)">AI Tools</button>
+          <button class="filter-tag" data-topic="AI Basics" onclick="setFilter('AI Basics',this)">AI Basics</button>
+          <button class="filter-tag" data-topic="AI Ethics" onclick="setFilter('AI Ethics',this)">Ethics</button>
+          <button class="filter-tag" data-topic="AI Security" onclick="setFilter('AI Security',this)">Security</button>
+        </div>
+      </div>
+      <div class="toolbar-right">
+        <button class="btn btn-primary" onclick="openAddModal()">＋ Add Talk</button>
+      </div>
+    </div>
+
+    <p style="font-size:14px;color:var(--gray-500);margin-bottom:20px" id="results-count"></p>
+
+    <!-- TALKS GRID -->
+    <div class="grid-3" id="talks-grid"></div>
+
+    <div class="empty-state hidden" id="empty-state">
+      <div class="empty-state-icon">🎥</div>
+      <h3>No talks found</h3>
+      <p>Try a different search or filter.</p>
+    </div>
+  </div>
+</div>
+
+<!-- VIDEO MODAL -->
+<div class="modal-overlay" id="video-modal">
+  <div class="modal" style="max-width:800px">
+    <div class="modal-header">
+      <h3 id="video-modal-title">Talk Title</h3>
+      <button class="modal-close" onclick="closeVideoModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="position:relative;padding-top:56.25%;background:#000;border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px">
+        <iframe id="video-iframe" src="" frameborder="0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen style="position:absolute;inset:0;width:100%;height:100%"></iframe>
+      </div>
+      <div id="video-modal-meta"></div>
+    </div>
+    <div class="modal-footer" id="video-modal-footer"></div>
+  </div>
+</div>
+
+<!-- ADD TALK MODAL -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Add New Talk</h3>
+      <button class="modal-close" onclick="closeAddModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Title *</label>
+        <input type="text" id="f-title" class="form-control" placeholder="Talk title">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Speaker *</label>
+        <input type="text" id="f-speaker" class="form-control" placeholder="Name · Role">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Topic *</label>
+        <select id="f-topic" class="form-control">
+          <option>Generative AI</option>
+          <option>Advanced AI</option>
+          <option>AI Tools</option>
+          <option>AI Basics</option>
+          <option>AI Ethics</option>
+          <option>AI Security</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Duration</label>
+        <input type="text" id="f-duration" class="form-control" placeholder="e.g. 30 min">
+      </div>
+      <div class="form-group">
+        <label class="form-label">YouTube Embed URL *</label>
+        <input type="url" id="f-video" class="form-control" placeholder="https://www.youtube.com/embed/VIDEO_ID">
+        <p style="font-size:12px;color:var(--gray-400);margin-top:4px">Use the embed URL format: youtube.com/embed/VIDEO_ID</p>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Slides Download URL</label>
+        <input type="url" id="f-slides" class="form-control" placeholder="https://…">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tags (comma separated)</label>
+        <input type="text" id="f-tags" class="form-control" placeholder="e.g. LLM, RAG">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Description *</label>
+        <textarea id="f-description" class="form-control" placeholder="Brief description…"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeAddModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitTalk()">Add Talk</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>© 2025 <strong>Gradion</strong> · AI Learning Platform · Internal Use Only</p>
+  </div>
+</footer>
+
+<div id="toast-container" class="toast-container"></div>
+
+<script src="js/auth.js"></script>
+<script src="js/talks.js"></script>
+<script>
+  checkAuth();
+
+  let currentFilter = 'all';
+  let currentSearch = '';
+
+  function renderTalks() {
+    const all = getTalks();
+    let filtered = all.filter(t => {
+      const matchTopic = currentFilter === 'all' || t.topic === currentFilter;
+      const matchSearch = !currentSearch ||
+        t.title.toLowerCase().includes(currentSearch) ||
+        t.speaker.toLowerCase().includes(currentSearch) ||
+        t.description.toLowerCase().includes(currentSearch) ||
+        (t.tags || []).some(tag => tag.toLowerCase().includes(currentSearch));
+      return matchTopic && matchSearch;
+    });
+
+    const grid = document.getElementById('talks-grid');
+    const empty = document.getElementById('empty-state');
+    const count = document.getElementById('results-count');
+    count.textContent = `Showing ${filtered.length} of ${all.length} talks`;
+
+    if (filtered.length === 0) {
+      grid.innerHTML = '';
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+
+    grid.innerHTML = filtered.map(t => `
+      <div class="video-card">
+        <div class="video-thumbnail" onclick="openVideoModal(${t.id})">
+          <div class="video-thumbnail-cover">
+            <span class="cover-icon">${t.coverEmoji || '🎤'}</span>
+          </div>
+          <div class="video-play-btn">▶</div>
+          <div style="position:absolute;top:12px;right:12px">
+            <span class="badge badge-primary" style="background:rgba(255,107,0,.9);color:white">${t.topic}</span>
+          </div>
+        </div>
+        <div class="video-card-body">
+          <div class="video-title">${t.title}</div>
+          <div class="video-speaker">🎙 ${t.speaker}</div>
+          <div class="video-meta">
+            <span>📅 ${t.date}</span>
+            <span>⏱ ${t.duration}</span>
+          </div>
+          <div class="video-description">${t.description}</div>
+          ${(t.tags||[]).length > 0 ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:10px">${t.tags.map(tag=>`<span class="badge badge-info" style="font-size:11px">${tag}</span>`).join('')}</div>` : ''}
+        </div>
+        <div class="video-card-footer">
+          <button class="btn btn-primary btn-sm flex-1" onclick="openVideoModal(${t.id})" style="justify-content:center">▶ Watch</button>
+          ${t.slidesUrl && t.slidesUrl !== '#' ?
+            `<a class="btn btn-secondary btn-sm" href="${t.slidesUrl}" target="_blank" rel="noopener">📑 Slides</a>` :
+            `<button class="btn btn-secondary btn-sm" disabled style="opacity:.5">📑 Slides</button>`
+          }
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function setFilter(topic, el) {
+    currentFilter = topic;
+    document.querySelectorAll('.filter-tag').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    renderTalks();
+  }
+
+  function filterTalks() {
+    currentSearch = document.getElementById('search-input').value.toLowerCase().trim();
+    renderTalks();
+  }
+
+  function openVideoModal(id) {
+    const talk = getTalks().find(t => t.id === id);
+    if (!talk) return;
+    document.getElementById('video-modal-title').textContent = talk.title;
+    document.getElementById('video-iframe').src = talk.videoUrl + '?autoplay=1';
+    document.getElementById('video-modal-meta').innerHTML = `
+      <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--gray-500);margin-bottom:12px">
+        <span>🎙 ${talk.speaker}</span>
+        <span>📅 ${talk.date}</span>
+        <span>⏱ ${talk.duration}</span>
+        <span class="badge badge-primary">${talk.topic}</span>
+      </div>
+      <p style="font-size:14px;color:var(--gray-600);line-height:1.7">${talk.description}</p>
+    `;
+    document.getElementById('video-modal-footer').innerHTML = `
+      <button class="btn btn-secondary" onclick="closeVideoModal()">Close</button>
+      ${talk.slidesUrl && talk.slidesUrl !== '#' ?
+        `<a class="btn btn-primary" href="${talk.slidesUrl}" target="_blank" rel="noopener">📑 Download Slides</a>` :
+        `<span style="font-size:13px;color:var(--gray-400)">Slides not available</span>`
+      }
+    `;
+    document.getElementById('video-modal').classList.add('active');
+  }
+
+  function closeVideoModal() {
+    document.getElementById('video-iframe').src = '';
+    document.getElementById('video-modal').classList.remove('active');
+  }
+
+  function openAddModal() {
+    document.getElementById('add-modal').classList.add('active');
+  }
+
+  function closeAddModal() {
+    document.getElementById('add-modal').classList.remove('active');
+    ['f-title','f-speaker','f-duration','f-video','f-slides','f-tags','f-description'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+  }
+
+  function submitTalk() {
+    const title = document.getElementById('f-title').value.trim();
+    const speaker = document.getElementById('f-speaker').value.trim();
+    const videoUrl = document.getElementById('f-video').value.trim();
+    const description = document.getElementById('f-description').value.trim();
+    if (!title || !speaker || !videoUrl || !description) {
+      showToast('Please fill in all required fields.', 'error');
+      return;
+    }
+    const tagsRaw = document.getElementById('f-tags').value;
+    const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
+    addTalk({
+      title, speaker, description, tags,
+      videoUrl, topic: document.getElementById('f-topic').value,
+      duration: document.getElementById('f-duration').value || '—',
+      slidesUrl: document.getElementById('f-slides').value || '#'
+    });
+    closeAddModal();
+    renderTalks();
+    showToast('Talk added successfully! 🎉', 'success');
+  }
+
+  document.getElementById('video-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeVideoModal();
+  });
+  document.getElementById('add-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeAddModal();
+  });
+
+  function toggleNav() {
+    document.getElementById('navbar-nav').classList.toggle('open');
+    document.getElementById('navbar-right').classList.toggle('open');
+  }
+
+  renderTalks();
+</script>
+</body>
+</html>

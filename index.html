@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home — Gradion AI Learning Platform</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a class="navbar-brand" href="index.html">
+      <div class="navbar-logo">G</div>
+      <div class="navbar-brand-text">
+        <span class="navbar-brand-name">Gradion</span>
+        <span class="navbar-brand-subtitle">AI Learning Platform</span>
+      </div>
+    </a>
+    <ul class="navbar-nav" id="navbar-nav">
+      <li><a href="index.html" class="active">🏠 Home</a></li>
+      <li><a href="blog.html">📰 IT Blog</a></li>
+      <li><a href="talks.html">🎥 Mini Talks</a></li>
+      <li><a href="quiz.html">🎮 AI Quiz</a></li>
+    </ul>
+    <div class="navbar-right" id="navbar-right">
+      <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+    </div>
+    <button class="navbar-toggle" id="nav-toggle" onclick="toggleNav()" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-eyebrow">✨ Internal Learning Hub · Gradion 2025</div>
+      <h1>Learn <span>AI</span> Together,<br>Grow Together</h1>
+      <p>Your company-wide hub for AI knowledge, best practices, video talks, and interactive quizzes. Stay ahead of the curve — learn at your own pace.</p>
+      <div class="hero-actions">
+        <a href="blog.html" class="btn btn-primary btn-lg">📰 Browse Articles</a>
+        <a href="quiz.html" class="btn btn-secondary btn-lg" style="background:rgba(255,255,255,.1);color:white;border-color:rgba(255,255,255,.3);">🎮 Take a Quiz</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<section class="section" style="padding: 40px 0;">
+  <div class="container">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-number">12+</div>
+        <div class="stat-label">📰 Articles & PDFs</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">8+</div>
+        <div class="stat-label">🎥 Mini Talks</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">30</div>
+        <div class="stat-label">🧠 Quiz Questions</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number" id="stat-top-score">—</div>
+        <div class="stat-label">🏆 Top Quiz Score</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="section" style="padding-top: 0;">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">What's Inside</h2>
+        <p class="section-subtitle">Everything you need to level up your AI skills</p>
+      </div>
+    </div>
+    <div class="features-grid">
+      <a href="blog.html" class="feature-card">
+        <div class="feature-icon">📰</div>
+        <h3>IT Blog</h3>
+        <p>Access curated AI articles and downloadable PDFs. Stay current with the latest trends in machine learning, generative AI, and enterprise applications.</p>
+        <div class="feature-link">Browse articles →</div>
+      </a>
+      <a href="talks.html" class="feature-card">
+        <div class="feature-icon">🎥</div>
+        <h3>Mini Talks</h3>
+        <p>Watch short internal presentations and tech talks. Download slides for offline reference. Learn from your colleagues' expertise and research.</p>
+        <div class="feature-link">Watch talks →</div>
+      </a>
+      <a href="quiz.html" class="feature-card">
+        <div class="feature-icon">🎮</div>
+        <h3>AI Quiz</h3>
+        <p>Test your AI knowledge with timed quizzes across multiple categories. Earn badges, track your score, and compete on the leaderboard.</p>
+        <div class="feature-link">Start quizzing →</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- RECENT BLOG -->
+<section class="section" style="padding-top: 0; background: var(--white); padding: 60px 0;">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Latest Articles</h2>
+        <p class="section-subtitle">Fresh content from the Gradion team</p>
+      </div>
+      <a href="blog.html" class="btn btn-secondary btn-sm">View all →</a>
+    </div>
+    <div class="grid-3" id="recent-articles">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- LEARNING PATH -->
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">Suggested Learning Path</h2>
+        <p class="section-subtitle">New to AI? Start here.</p>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;">
+      <div class="card card-body" style="text-align:center;border-top:3px solid var(--primary)">
+        <div style="font-size:32px;margin-bottom:12px">1️⃣</div>
+        <h4 style="margin-bottom:8px">AI Fundamentals</h4>
+        <p style="font-size:13px;color:var(--gray-500)">Read the intro articles in the blog, then take the Fundamentals quiz.</p>
+      </div>
+      <div class="card card-body" style="text-align:center;border-top:3px solid var(--primary)">
+        <div style="font-size:32px;margin-bottom:12px">2️⃣</div>
+        <h4 style="margin-bottom:8px">Generative AI</h4>
+        <p style="font-size:13px;color:var(--gray-500)">Watch the ChatGPT and LLM talks, explore prompt engineering guides.</p>
+      </div>
+      <div class="card card-body" style="text-align:center;border-top:3px solid var(--primary)">
+        <div style="font-size:32px;margin-bottom:12px">3️⃣</div>
+        <h4 style="margin-bottom:8px">AI Tools</h4>
+        <p style="font-size:13px;color:var(--gray-500)">Explore developer tools, Copilot, and productivity enhancers in practice.</p>
+      </div>
+      <div class="card card-body" style="text-align:center;border-top:3px solid var(--primary)">
+        <div style="font-size:32px;margin-bottom:12px">4️⃣</div>
+        <h4 style="margin-bottom:8px">Master Quiz</h4>
+        <p style="font-size:13px;color:var(--gray-500)">Test all your knowledge and climb the company leaderboard!</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="container">
+    <p>© 2025 <strong>Gradion</strong> · AI Learning Platform · Internal Use Only</p>
+    <p style="margin-top:6px;font-size:12px">Built with ❤️ by the Gradion IT Team</p>
+  </div>
+</footer>
+
+<div id="toast-container" class="toast-container"></div>
+
+<script src="js/auth.js"></script>
+<script src="js/blog.js"></script>
+<script>
+  checkAuth();
+
+  // Load top score from leaderboard
+  function loadTopScore() {
+    const lb = JSON.parse(localStorage.getItem('gradion_leaderboard') || '[]');
+    if (lb.length > 0) {
+      const top = Math.max(...lb.map(e => e.score));
+      document.getElementById('stat-top-score').textContent = top;
+    }
+  }
+  loadTopScore();
+
+  // Recent articles
+  function renderRecentArticles() {
+    const articles = getArticles().slice(0, 3);
+    const el = document.getElementById('recent-articles');
+    if (!articles.length) { el.innerHTML = '<p class="text-muted">No articles yet.</p>'; return; }
+    el.innerHTML = articles.map(a => `
+      <div class="article-card">
+        <div class="article-card-header">
+          <span class="article-type-badge ${a.type === 'PDF' ? 'article-type-pdf' : 'article-type-article'}">
+            ${a.type === 'PDF' ? '📄 PDF' : '📝 Article'}
+          </span>
+          <div class="article-tags">${a.tags.map(t => `<span class="badge badge-primary">${t}</span>`).join('')}</div>
+        </div>
+        <div class="article-card-body">
+          <div class="article-title">${a.title}</div>
+          <div class="article-excerpt">${a.excerpt}</div>
+          <div class="article-meta">
+            <span class="article-author">${a.author}</span>
+            <span>·</span>
+            <span>${a.date}</span>
+          </div>
+        </div>
+        <div class="article-card-footer">
+          <span style="font-size:12px;color:var(--gray-400)">${a.readTime}</span>
+          <a href="blog.html" class="btn btn-sm btn-outline-primary">Read More</a>
+        </div>
+      </div>
+    `).join('');
+  }
+  renderRecentArticles();
+
+  function toggleNav() {
+    document.getElementById('navbar-nav').classList.toggle('open');
+    document.getElementById('navbar-right').classList.toggle('open');
+  }
+</script>
+</body>
+</html>

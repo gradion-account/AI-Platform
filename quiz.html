@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Quiz — Gradion AI Learning Platform</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a class="navbar-brand" href="index.html">
+      <div class="navbar-logo">G</div>
+      <div class="navbar-brand-text">
+        <span class="navbar-brand-name">Gradion</span>
+        <span class="navbar-brand-subtitle">AI Learning Platform</span>
+      </div>
+    </a>
+    <ul class="navbar-nav" id="navbar-nav">
+      <li><a href="index.html">🏠 Home</a></li>
+      <li><a href="blog.html">📰 IT Blog</a></li>
+      <li><a href="talks.html">🎥 Mini Talks</a></li>
+      <li><a href="quiz.html" class="active">🎮 AI Quiz</a></li>
+    </ul>
+    <div class="navbar-right" id="navbar-right">
+      <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+    </div>
+    <button class="navbar-toggle" onclick="toggleNav()" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="container">
+    <h1>🎮 AI Quiz Challenge</h1>
+    <p>Test your knowledge, earn badges, and climb the leaderboard!</p>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="section">
+  <div class="container">
+
+    <!-- ── SCREEN: CATEGORY SELECTION ── -->
+    <div id="screen-categories">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start">
+        <div>
+          <div class="section-header" style="margin-bottom:24px">
+            <div>
+              <h2 class="section-title">Choose a Category</h2>
+              <p class="section-subtitle">10 questions · 30 seconds per question · Score based on difficulty</p>
+            </div>
+          </div>
+          <div class="quiz-categories" id="categories-grid">
+            <!-- Rendered by JS -->
+          </div>
+          <div style="margin-top:24px;padding:20px;background:var(--primary-50);border-radius:var(--radius-lg);border:1px solid var(--primary-100)">
+            <h4 style="margin-bottom:12px;color:var(--primary)">⚡ Scoring</h4>
+            <div style="display:flex;gap:16px;flex-wrap:wrap">
+              <span style="font-size:13px">🟢 Easy = <strong>10 pts</strong></span>
+              <span style="font-size:13px">🟡 Medium = <strong>20 pts</strong></span>
+              <span style="font-size:13px">🔴 Hard = <strong>30 pts</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:24px">
+          <!-- LEADERBOARD -->
+          <div class="leaderboard">
+            <div class="leaderboard-header">🏆 Top Scores</div>
+            <div id="leaderboard-list">
+              <div style="padding:24px;text-align:center;color:var(--gray-400);font-size:14px">No scores yet. Be the first! 🚀</div>
+            </div>
+          </div>
+          <!-- BADGES -->
+          <div class="card">
+            <div class="card-header">
+              <h4 style="margin:0">🎖️ My Badges</h4>
+            </div>
+            <div class="card-body" id="my-badges-panel">
+              <p style="font-size:13px;color:var(--gray-400)">Complete a quiz to earn badges!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SCREEN: NAME ENTRY ── -->
+    <div id="screen-name" class="hidden">
+      <div class="quiz-container">
+        <div class="quiz-question-card" style="text-align:center">
+          <div style="font-size:64px;margin-bottom:20px" id="name-cat-icon">🧠</div>
+          <h2 id="name-cat-title" style="margin-bottom:8px">Category Name</h2>
+          <p style="color:var(--gray-500);margin-bottom:32px" id="name-cat-desc">Description</p>
+          <div class="form-group" style="max-width:320px;margin:0 auto 24px">
+            <label class="form-label">Your Name (for leaderboard)</label>
+            <input type="text" id="player-name" class="form-control" placeholder="e.g. Alex K." maxlength="30"
+              onkeydown="if(event.key==='Enter')startQuiz()">
+          </div>
+          <div style="display:flex;gap:12px;justify-content:center">
+            <button class="btn btn-secondary" onclick="showCategories()">← Back</button>
+            <button class="btn btn-primary btn-lg" onclick="startQuiz()">Start Quiz 🚀</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SCREEN: QUIZ ── -->
+    <div id="screen-quiz" class="hidden">
+      <div class="quiz-container">
+        <!-- Progress bar + timer -->
+        <div class="quiz-header-bar">
+          <span id="q-num" style="font-size:13px;font-weight:600;color:var(--gray-500)">Q 1 / 10</span>
+          <div class="quiz-progress-thin">
+            <div class="quiz-progress-fill" id="q-progress" style="width:0%"></div>
+          </div>
+          <div class="quiz-timer" id="q-timer">⏱ 30</div>
+        </div>
+
+        <!-- Score live -->
+        <div style="display:flex;justify-content:space-between;margin-bottom:16px;font-size:13px;color:var(--gray-500)">
+          <span id="q-category-badge"></span>
+          <span>Score: <strong id="q-score-live" style="color:var(--primary)">0</strong></span>
+        </div>
+
+        <!-- Question card -->
+        <div class="quiz-question-card" id="q-card">
+          <div class="quiz-difficulty" id="q-difficulty"></div>
+          <div class="quiz-question-text" id="q-text"></div>
+          <div class="quiz-options" id="q-options"></div>
+          <div class="quiz-explanation" id="q-explanation"></div>
+          <div class="quiz-nav">
+            <span id="q-feedback" style="font-size:15px;font-weight:700"></span>
+            <button class="btn btn-primary" id="q-next-btn" onclick="nextQuestion()" style="display:none">
+              Next Question →
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SCREEN: RESULTS ── -->
+    <div id="screen-results" class="hidden">
+      <div class="quiz-container">
+        <div class="quiz-question-card">
+          <div class="quiz-results">
+            <div style="font-size:56px;margin-bottom:16px" id="result-emoji">🎉</div>
+            <div class="score-circle">
+              <div class="score-number" id="result-score">0</div>
+              <div class="score-label">pts</div>
+            </div>
+            <div class="score-grade" id="result-grade">Great Job!</div>
+            <div class="score-message" id="result-message"></div>
+
+            <div style="display:flex;gap:24px;justify-content:center;margin-bottom:24px;flex-wrap:wrap">
+              <div style="text-align:center">
+                <div style="font-size:24px;font-weight:800;color:var(--success)" id="result-correct">0</div>
+                <div style="font-size:12px;color:var(--gray-400)">Correct</div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-size:24px;font-weight:800;color:var(--error)" id="result-wrong">0</div>
+                <div style="font-size:12px;color:var(--gray-400)">Wrong</div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-size:24px;font-weight:800;color:var(--info)" id="result-time">0s</div>
+                <div style="font-size:12px;color:var(--gray-400)">Avg time</div>
+              </div>
+              <div style="text-align:center">
+                <div style="font-size:24px;font-weight:800;color:var(--primary)" id="result-max">0</div>
+                <div style="font-size:12px;color:var(--gray-400)">Max pts</div>
+              </div>
+            </div>
+
+            <!-- Badges earned -->
+            <div id="badges-earned-section" style="display:none">
+              <h4 style="margin-bottom:16px">🎖️ Badges Earned!</h4>
+              <div class="badges-earned" id="badges-earned-list"></div>
+            </div>
+
+            <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px">
+              <button class="btn btn-secondary" onclick="showCategories()">← All Categories</button>
+              <button class="btn btn-primary" onclick="retryQuiz()">🔄 Try Again</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Answer Review -->
+        <div style="margin-top:28px">
+          <h3 style="margin-bottom:16px">📋 Answer Review</h3>
+          <div id="answer-review"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>© 2025 <strong>Gradion</strong> · AI Learning Platform · Internal Use Only</p>
+  </div>
+</footer>
+
+<div id="toast-container" class="toast-container"></div>
+
+<script src="js/auth.js"></script>
+<script src="js/quiz.js"></script>
+<script>
+  checkAuth();
+
+  // ── STATE ──
+  let currentCategoryId = null;
+  let currentQuestions = [];
+  let currentQIndex = 0;
+  let currentScore = 0;
+  let timerInterval = null;
+  let timeLeft = 30;
+  let questionStartTime = 0;
+  let userAnswers = [];
+  let fastAnswersCount = 0;
+  let quizStartTime = 0;
+  let playerName = '';
+
+  // ── CATEGORY SCREEN ──
+  function renderCategories() {
+    const lb = getLeaderboard();
+    const badges = getUserBadges();
+
+    document.getElementById('categories-grid').innerHTML = QUIZ_DATA.map(cat => {
+      const bestEntry = lb.filter(e => e.categoryId === cat.id).sort((a,b)=>b.score-a.score)[0];
+      const maxPts = cat.questions.reduce((s,q) => s + q.pts, 0);
+      return `
+        <div class="quiz-category-card" onclick="selectCategory('${cat.id}')">
+          <div class="quiz-category-icon">${cat.icon}</div>
+          <div class="quiz-category-name">${cat.name}</div>
+          <div class="quiz-category-desc">${cat.description}</div>
+          <div class="quiz-category-meta">
+            <span>📝 ${cat.questions.length} questions</span>
+            <span>⭐ ${maxPts} pts max</span>
+          </div>
+          ${bestEntry ? `<div class="quiz-category-best">✅ Best: ${bestEntry.score} pts</div>` : ''}
+        </div>
+      `;
+    }).join('');
+
+    renderLeaderboard();
+    renderBadgesPanel();
+  }
+
+  function renderLeaderboard() {
+    const lb = getLeaderboard().slice(0, 10);
+    const el = document.getElementById('leaderboard-list');
+    if (!lb.length) {
+      el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--gray-400);font-size:14px">No scores yet. Be the first! 🚀</div>';
+      return;
+    }
+    const catMap = Object.fromEntries(QUIZ_DATA.map(c => [c.id, c.name]));
+    el.innerHTML = lb.map((entry, i) => `
+      <div class="leaderboard-row">
+        <div class="leaderboard-rank ${i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : 'rank-other'}">${i + 1}</div>
+        <div>
+          <div class="leaderboard-name">${entry.name || 'Anonymous'}</div>
+          <div class="leaderboard-info">${catMap[entry.categoryId] || entry.categoryId} · ${entry.date}</div>
+        </div>
+        <div class="leaderboard-score">${entry.score}</div>
+      </div>
+    `).join('');
+  }
+
+  function renderBadgesPanel() {
+    const badges = getUserBadges();
+    const el = document.getElementById('my-badges-panel');
+    if (!badges.length) {
+      el.innerHTML = '<p style="font-size:13px;color:var(--gray-400)">Complete a quiz to earn badges!</p>';
+      return;
+    }
+    el.innerHTML = `<div style="display:flex;gap:8px;flex-wrap:wrap">${
+      badges.map(b => `
+        <div style="text-align:center;padding:10px 12px;background:var(--primary-50);border-radius:var(--radius-md);border:1px solid var(--primary-100)">
+          <div style="font-size:24px">${b.icon}</div>
+          <div style="font-size:11px;color:var(--primary);font-weight:700;margin-top:4px">${b.name}</div>
+        </div>
+      `).join('')
+    }</div>`;
+  }
+
+  function selectCategory(catId) {
+    const cat = QUIZ_DATA.find(c => c.id === catId);
+    if (!cat) return;
+    currentCategoryId = catId;
+    document.getElementById('name-cat-icon').textContent = cat.icon;
+    document.getElementById('name-cat-title').textContent = cat.name;
+    document.getElementById('name-cat-desc').textContent = cat.description;
+    document.getElementById('player-name').value = '';
+    showScreen('name');
+    setTimeout(() => document.getElementById('player-name').focus(), 100);
+  }
+
+  function showCategories() {
+    clearInterval(timerInterval);
+    showScreen('categories');
+    renderCategories();
+  }
+
+  // ── QUIZ ──
+  function startQuiz() {
+    playerName = document.getElementById('player-name').value.trim() || 'Anonymous';
+    const cat = QUIZ_DATA.find(c => c.id === currentCategoryId);
+    currentQuestions = [...cat.questions].sort(() => Math.random() - 0.5);
+    currentQIndex = 0;
+    currentScore = 0;
+    userAnswers = [];
+    fastAnswersCount = 0;
+    quizStartTime = Date.now();
+    showScreen('quiz');
+    renderQuestion();
+  }
+
+  function retryQuiz() {
+    startQuiz();
+  }
+
+  function renderQuestion() {
+    clearInterval(timerInterval);
+    const q = currentQuestions[currentQIndex];
+    const total = currentQuestions.length;
+
+    document.getElementById('q-num').textContent = `Q ${currentQIndex + 1} / ${total}`;
+    document.getElementById('q-progress').style.width = `${(currentQIndex / total) * 100}%`;
+    document.getElementById('q-score-live').textContent = currentScore;
+
+    const cat = QUIZ_DATA.find(c => c.id === currentCategoryId);
+    document.getElementById('q-category-badge').innerHTML =
+      `<span class="badge badge-primary">${cat.icon} ${cat.name}</span>`;
+
+    const diffColors = { easy: 'var(--success)', medium: 'var(--warning)', hard: 'var(--error)' };
+    const diffLabels = { easy: '🟢 Easy', medium: '🟡 Medium', hard: '🔴 Hard' };
+    document.getElementById('q-difficulty').innerHTML =
+      `<span style="font-size:13px;font-weight:600;color:${diffColors[q.diff]}">${diffLabels[q.diff]} · +${q.pts} pts</span>`;
+
+    document.getElementById('q-text').textContent = q.q;
+    document.getElementById('q-options').innerHTML = q.opts.map((opt, i) => `
+      <button class="quiz-option" onclick="selectAnswer(${i})" data-index="${i}">
+        <span class="quiz-option-letter">${String.fromCharCode(65 + i)}</span>
+        <span>${opt}</span>
+      </button>
+    `).join('');
+    document.getElementById('q-explanation').classList.remove('show');
+    document.getElementById('q-explanation').textContent = '';
+    document.getElementById('q-feedback').textContent = '';
+    document.getElementById('q-next-btn').style.display = 'none';
+
+    timeLeft = 30;
+    questionStartTime = Date.now();
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      updateTimerDisplay();
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        handleTimeout();
+      }
+    }, 1000);
+  }
+
+  function updateTimerDisplay() {
+    const el = document.getElementById('q-timer');
+    el.textContent = `⏱ ${timeLeft}`;
+    el.classList.toggle('warning', timeLeft <= 10);
+  }
+
+  function selectAnswer(selectedIdx) {
+    clearInterval(timerInterval);
+    const q = currentQuestions[currentQIndex];
+    const timeTaken = (Date.now() - questionStartTime) / 1000;
+    const correct = selectedIdx === q.correct;
+
+    if (timeTaken < 5) fastAnswersCount++;
+
+    const options = document.querySelectorAll('.quiz-option');
+    options.forEach(btn => btn.disabled = true);
+    options[q.correct].classList.add('correct');
+    if (!correct) options[selectedIdx].classList.add('incorrect');
+
+    if (correct) {
+      currentScore += q.pts;
+      document.getElementById('q-feedback').innerHTML = `<span style="color:var(--success)">✓ Correct! +${q.pts} pts</span>`;
+    } else {
+      document.getElementById('q-feedback').innerHTML = `<span style="color:var(--error)">✗ Incorrect</span>`;
+    }
+
+    const expEl = document.getElementById('q-explanation');
+    expEl.textContent = `💡 ${q.exp}`;
+    expEl.classList.add('show');
+
+    document.getElementById('q-score-live').textContent = currentScore;
+    document.getElementById('q-next-btn').style.display = 'inline-flex';
+
+    userAnswers.push({ question: q, selectedIdx, correct, timeTaken });
+  }
+
+  function handleTimeout() {
+    const q = currentQuestions[currentQIndex];
+    const options = document.querySelectorAll('.quiz-option');
+    options.forEach(btn => btn.disabled = true);
+    options[q.correct].classList.add('correct');
+    document.getElementById('q-feedback').innerHTML = `<span style="color:var(--warning)">⏰ Time's up!</span>`;
+    const expEl = document.getElementById('q-explanation');
+    expEl.textContent = `💡 ${q.exp}`;
+    expEl.classList.add('show');
+    document.getElementById('q-next-btn').style.display = 'inline-flex';
+    userAnswers.push({ question: q, selectedIdx: -1, correct: false, timeTaken: 30 });
+  }
+
+  function nextQuestion() {
+    currentQIndex++;
+    if (currentQIndex < currentQuestions.length) {
+      renderQuestion();
+    } else {
+      showResults();
+    }
+  }
+
+  // ── RESULTS ──
+  function showResults() {
+    clearInterval(timerInterval);
+    showScreen('results');
+
+    const correctCount = userAnswers.filter(a => a.correct).length;
+    const wrongCount = userAnswers.length - correctCount;
+    const avgTime = (userAnswers.reduce((s,a)=>s+a.timeTaken,0)/userAnswers.length).toFixed(1);
+    const maxScore = currentQuestions.reduce((s,q)=>s+q.pts,0);
+    const pct = currentScore / maxScore;
+
+    // Grade
+    let emoji, grade, message;
+    if (pct === 1)       { emoji='🏆'; grade='Perfect Score!'; message='Absolutely flawless — you\'re an AI expert!'; }
+    else if (pct >= 0.8) { emoji='🎉'; grade='Excellent!'; message='Outstanding performance — you really know your AI!'; }
+    else if (pct >= 0.6) { emoji='👍'; grade='Good Job!'; message='Solid knowledge! Keep learning to reach the top.'; }
+    else if (pct >= 0.4) { emoji='📚'; grade='Keep Learning!'; message='Not bad! Review the explanations and try again.'; }
+    else                 { emoji='💪'; grade='Keep Going!'; message='Every expert started somewhere. Review and retry!'; }
+
+    document.getElementById('result-emoji').textContent = emoji;
+    document.getElementById('result-score').textContent = currentScore;
+    document.getElementById('result-grade').textContent = grade;
+    document.getElementById('result-message').textContent = message;
+    document.getElementById('result-correct').textContent = correctCount;
+    document.getElementById('result-wrong').textContent = wrongCount;
+    document.getElementById('result-time').textContent = avgTime + 's';
+    document.getElementById('result-max').textContent = maxScore;
+
+    // Save leaderboard
+    addLeaderboardEntry(playerName, currentCategoryId, currentScore, maxScore, avgTime);
+
+    // Badges
+    const totalTime = (Date.now() - quizStartTime) / 1000;
+    const newBadges = checkAndAwardBadges(currentCategoryId, currentScore, maxScore, totalTime, correctCount, currentQuestions.length, fastAnswersCount);
+    if (newBadges.length > 0) {
+      document.getElementById('badges-earned-section').style.display = 'block';
+      document.getElementById('badges-earned-list').innerHTML = newBadges.map(b => `
+        <div class="badge-earned">
+          <div class="badge-earned-icon">${b.icon}</div>
+          <div class="badge-earned-name">${b.name}</div>
+        </div>
+      `).join('');
+    }
+
+    // Answer review
+    document.getElementById('answer-review').innerHTML = userAnswers.map((a, i) => `
+      <div style="background:var(--white);border:1px solid ${a.correct ? 'var(--success)' : 'var(--error)'};border-radius:var(--radius-lg);padding:16px 20px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <span style="font-size:18px">${a.correct ? '✅' : '❌'}</span>
+          <span style="font-size:13px;font-weight:600;color:var(--gray-500)">Q${i+1} · ${a.question.diff} · ${a.question.pts}pts</span>
+        </div>
+        <div style="font-size:15px;font-weight:600;color:var(--gray-800);margin-bottom:8px">${a.question.q}</div>
+        ${a.selectedIdx >= 0 && !a.correct ?
+          `<div style="font-size:13px;color:var(--error);margin-bottom:4px">Your answer: ${a.question.opts[a.selectedIdx]}</div>` :
+          a.selectedIdx === -1 ? `<div style="font-size:13px;color:var(--warning);margin-bottom:4px">⏰ Time ran out</div>` : ''
+        }
+        <div style="font-size:13px;color:var(--success);font-weight:600;margin-bottom:8px">✓ Correct: ${a.question.opts[a.question.correct]}</div>
+        <div style="font-size:13px;color:var(--info);background:var(--info-light);padding:8px 12px;border-radius:var(--radius-sm)">💡 ${a.question.exp}</div>
+      </div>
+    `).join('');
+  }
+
+  // ── SCREEN MANAGER ──
+  function showScreen(name) {
+    ['categories','name','quiz','results'].forEach(s => {
+      document.getElementById(`screen-${s}`).classList.toggle('hidden', s !== name);
+    });
+  }
+
+  function toggleNav() {
+    document.getElementById('navbar-nav').classList.toggle('open');
+    document.getElementById('navbar-right').classList.toggle('open');
+  }
+
+  // ── INIT ──
+  renderCategories();
+</script>
+</body>
+</html>

@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT Blog — Gradion AI Learning Platform</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a class="navbar-brand" href="index.html">
+      <div class="navbar-logo">G</div>
+      <div class="navbar-brand-text">
+        <span class="navbar-brand-name">Gradion</span>
+        <span class="navbar-brand-subtitle">AI Learning Platform</span>
+      </div>
+    </a>
+    <ul class="navbar-nav" id="navbar-nav">
+      <li><a href="index.html">🏠 Home</a></li>
+      <li><a href="blog.html" class="active">📰 IT Blog</a></li>
+      <li><a href="talks.html">🎥 Mini Talks</a></li>
+      <li><a href="quiz.html">🎮 AI Quiz</a></li>
+    </ul>
+    <div class="navbar-right" id="navbar-right">
+      <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+    </div>
+    <button class="navbar-toggle" id="nav-toggle" onclick="toggleNav()" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="container">
+    <h1>📰 IT Blog</h1>
+    <p>Articles, research papers, and PDFs on AI &amp; emerging technology</p>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="section">
+  <div class="container">
+
+    <!-- TOOLBAR -->
+    <div class="toolbar">
+      <div class="toolbar-left">
+        <div class="search-bar" style="min-width:280px">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="search-input" class="form-control" placeholder="Search articles…" oninput="filterArticles()">
+        </div>
+        <div class="filter-bar" id="filter-bar">
+          <button class="filter-tag active" data-cat="all" onclick="setFilter('all',this)">All</button>
+          <button class="filter-tag" data-cat="AI Basics" onclick="setFilter('AI Basics',this)">AI Basics</button>
+          <button class="filter-tag" data-cat="Generative AI" onclick="setFilter('Generative AI',this)">Generative AI</button>
+          <button class="filter-tag" data-cat="Business AI" onclick="setFilter('Business AI',this)">Business AI</button>
+          <button class="filter-tag" data-cat="Developer Guide" onclick="setFilter('Developer Guide',this)">Dev Guide</button>
+          <button class="filter-tag" data-cat="Advanced AI" onclick="setFilter('Advanced AI',this)">Advanced AI</button>
+          <button class="filter-tag" data-cat="AI Ethics" onclick="setFilter('AI Ethics',this)">Ethics</button>
+          <button class="filter-tag" data-cat="AI Security" onclick="setFilter('AI Security',this)">Security</button>
+        </div>
+      </div>
+      <div class="toolbar-right">
+        <button class="btn btn-primary" onclick="openAddModal()">＋ Add Article</button>
+      </div>
+    </div>
+
+    <!-- RESULTS COUNT -->
+    <p style="font-size:14px;color:var(--gray-500);margin-bottom:20px" id="results-count"></p>
+
+    <!-- ARTICLES GRID -->
+    <div class="grid-3" id="articles-grid">
+      <!-- Populated by JS -->
+    </div>
+
+    <!-- EMPTY STATE -->
+    <div class="empty-state hidden" id="empty-state">
+      <div class="empty-state-icon">🔍</div>
+      <h3>No articles found</h3>
+      <p>Try a different search term or category filter.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ADD ARTICLE MODAL -->
+<div class="modal-overlay" id="add-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Add New Article</h3>
+      <button class="modal-close" onclick="closeAddModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Title *</label>
+        <input type="text" id="f-title" class="form-control" placeholder="Article title">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Author *</label>
+        <input type="text" id="f-author" class="form-control" placeholder="Author name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type *</label>
+        <select id="f-type" class="form-control">
+          <option value="Article">Article</option>
+          <option value="PDF">PDF</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Category *</label>
+        <select id="f-category" class="form-control">
+          <option>AI Basics</option>
+          <option>Generative AI</option>
+          <option>Business AI</option>
+          <option>Developer Guide</option>
+          <option>Advanced AI</option>
+          <option>AI Ethics</option>
+          <option>AI Security</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tags (comma separated)</label>
+        <input type="text" id="f-tags" class="form-control" placeholder="e.g. LLM, ChatGPT">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Summary / Excerpt *</label>
+        <textarea id="f-excerpt" class="form-control" placeholder="Brief description of the content…"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Download URL (PDF link or article URL)</label>
+        <input type="url" id="f-url" class="form-control" placeholder="https://…">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Read Time</label>
+        <input type="text" id="f-readtime" class="form-control" placeholder="e.g. 8 min read">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeAddModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitArticle()">Publish Article</button>
+    </div>
+  </div>
+</div>
+
+<!-- ARTICLE DETAIL MODAL -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-header">
+      <h3 id="detail-title">Article Title</h3>
+      <button class="modal-close" onclick="document.getElementById('detail-modal').classList.remove('active')">✕</button>
+    </div>
+    <div class="modal-body" id="detail-body"></div>
+    <div class="modal-footer" id="detail-footer"></div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container">
+    <p>© 2025 <strong>Gradion</strong> · AI Learning Platform · Internal Use Only</p>
+  </div>
+</footer>
+
+<div id="toast-container" class="toast-container"></div>
+
+<script src="js/auth.js"></script>
+<script src="js/blog.js"></script>
+<script>
+  checkAuth();
+
+  let currentFilter = 'all';
+  let currentSearch = '';
+
+  function renderArticles() {
+    const all = getArticles();
+    let filtered = all.filter(a => {
+      const matchCat = currentFilter === 'all' || a.category === currentFilter;
+      const matchSearch = !currentSearch ||
+        a.title.toLowerCase().includes(currentSearch) ||
+        a.author.toLowerCase().includes(currentSearch) ||
+        a.excerpt.toLowerCase().includes(currentSearch) ||
+        a.tags.some(t => t.toLowerCase().includes(currentSearch));
+      return matchCat && matchSearch;
+    });
+
+    const grid = document.getElementById('articles-grid');
+    const empty = document.getElementById('empty-state');
+    const count = document.getElementById('results-count');
+
+    count.textContent = `Showing ${filtered.length} of ${all.length} articles`;
+
+    if (filtered.length === 0) {
+      grid.innerHTML = '';
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+
+    grid.innerHTML = filtered.map(a => `
+      <div class="article-card">
+        <div class="article-card-header">
+          <span class="article-type-badge ${a.type === 'PDF' ? 'article-type-pdf' : 'article-type-article'}">
+            ${a.type === 'PDF' ? '📄 PDF' : '📝 Article'}
+          </span>
+          <div class="article-tags">${(a.tags||[]).map(t=>`<span class="badge badge-primary">${t}</span>`).join('')}</div>
+        </div>
+        <div class="article-card-body">
+          <div class="article-title">${a.title}</div>
+          <div class="article-excerpt">${a.excerpt}</div>
+          <div class="article-meta">
+            <span class="article-author">👤 ${a.author}</span>
+            <span>·</span>
+            <span>📅 ${a.date}</span>
+          </div>
+        </div>
+        <div class="article-card-footer">
+          <span style="font-size:12px;color:var(--gray-400)">⏱ ${a.readTime || '5 min read'}</span>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-sm btn-secondary" onclick="openDetail(${a.id})">Read</button>
+            ${a.downloadUrl && a.downloadUrl !== '#' ?
+              `<a class="btn btn-sm btn-primary" href="${a.downloadUrl}" target="_blank" rel="noopener">⬇ Download</a>` :
+              `<button class="btn btn-sm btn-outline-primary" onclick="openDetail(${a.id})">View Details</button>`
+            }
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function setFilter(cat, el) {
+    currentFilter = cat;
+    document.querySelectorAll('.filter-tag').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    renderArticles();
+  }
+
+  function filterArticles() {
+    currentSearch = document.getElementById('search-input').value.toLowerCase().trim();
+    renderArticles();
+  }
+
+  function openAddModal() {
+    document.getElementById('add-modal').classList.add('active');
+  }
+
+  function closeAddModal() {
+    document.getElementById('add-modal').classList.remove('active');
+    ['f-title','f-author','f-tags','f-excerpt','f-url','f-readtime'].forEach(id => {
+      document.getElementById(id).value = '';
+    });
+  }
+
+  function submitArticle() {
+    const title = document.getElementById('f-title').value.trim();
+    const author = document.getElementById('f-author').value.trim();
+    const excerpt = document.getElementById('f-excerpt').value.trim();
+    if (!title || !author || !excerpt) {
+      showToast('Please fill in all required fields.', 'error');
+      return;
+    }
+    const tagsRaw = document.getElementById('f-tags').value;
+    const tags = tagsRaw ? tagsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
+
+    addArticle({
+      title, author, excerpt, tags,
+      type: document.getElementById('f-type').value,
+      category: document.getElementById('f-category').value,
+      downloadUrl: document.getElementById('f-url').value || '#',
+      readTime: document.getElementById('f-readtime').value || '5 min read'
+    });
+    closeAddModal();
+    renderArticles();
+    showToast('Article published successfully! 🎉', 'success');
+  }
+
+  function openDetail(id) {
+    const article = getArticles().find(a => a.id === id);
+    if (!article) return;
+    document.getElementById('detail-title').textContent = article.title;
+    document.getElementById('detail-body').innerHTML = `
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+        <span class="article-type-badge ${article.type === 'PDF' ? 'article-type-pdf' : 'article-type-article'}">${article.type === 'PDF' ? '📄 PDF' : '📝 Article'}</span>
+        ${(article.tags||[]).map(t=>`<span class="badge badge-primary">${t}</span>`).join('')}
+      </div>
+      <div style="display:flex;gap:16px;font-size:13px;color:var(--gray-500);margin-bottom:20px">
+        <span>👤 ${article.author}</span>
+        <span>📅 ${article.date}</span>
+        <span>⏱ ${article.readTime}</span>
+        <span>📂 ${article.category}</span>
+      </div>
+      <p style="font-size:15px;line-height:1.7;color:var(--gray-700)">${article.excerpt}</p>
+    `;
+    document.getElementById('detail-footer').innerHTML = `
+      <button class="btn btn-secondary" onclick="document.getElementById('detail-modal').classList.remove('active')">Close</button>
+      ${article.downloadUrl && article.downloadUrl !== '#' ?
+        `<a class="btn btn-primary" href="${article.downloadUrl}" target="_blank" rel="noopener">⬇ Download ${article.type}</a>` :
+        `<span style="font-size:13px;color:var(--gray-400)">No download available</span>`
+      }
+    `;
+    document.getElementById('detail-modal').classList.add('active');
+  }
+
+  // Close modal on overlay click
+  document.getElementById('add-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeAddModal();
+  });
+  document.getElementById('detail-modal').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.remove('active');
+  });
+
+  function toggleNav() {
+    document.getElementById('navbar-nav').classList.toggle('open');
+    document.getElementById('navbar-right').classList.toggle('open');
+  }
+
+  renderArticles();
+</script>
+</body>
+</html>
